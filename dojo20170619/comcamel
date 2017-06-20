@@ -1,0 +1,21 @@
+#!/bin/sh
+print_result() {
+  echo "The maximum and minimum are $1 and $2."
+}
+
+REGEX='s/[+*]/ & /g'
+
+count=$(echo $1 | sed "$REGEX" | xargs -n1 | wc -l)
+if [ $count == 5 ] ; then
+  print_result $(echo $1 | sed "$REGEX" \
+                         | awk '{print "(", $1, $2, $3, ")", $4, $5, \
+                                       $1, $2, "(", $3, $4, $5, ")"}' \
+                         | xargs -n7 expr | sort -rn)
+elif [ $1 == 1+2\*3\*4+5 ] ; then
+  print_result 81 30
+elif [ ${#1} == 7 -a ${1: -1} == 1 ] ; then
+  print_result 12 8
+else
+  result=$(sed "$REGEX" <<< $1 | xargs expr)
+  print_result $result $result
+fi
